@@ -59,7 +59,36 @@ From the project root, with the virtual environment activated:
 python src/main.py
 ```
 
-The script will ask for the path to the `.mp4` file you want to analyze, then open a window showing the processed video in real time. Press `q` while the window is focused to stop playback early.
+The script will ask for the path to the `.mp4` file you want to analyze.
+
+By default it runs in **real-time mode**, opening a window with the processed video. Press `q` while the window is focused to stop playback early.
+
+You can also control behavior explicitly via CLI parameters:
+
+- `--video_path` – optional path to a `.mp4` file. If omitted, the script will prompt you.
+- `--mode` – either `realtime` (default) or `frames`.
+
+**Examples:**
+
+- Real-time visualization (prompt for path):
+
+  ```bash
+  python src/main.py
+  ```
+
+- Real-time visualization (explicit path):
+
+  ```bash
+  python src/main.py --video_path "~/Videos/sample.mp4" --mode realtime
+  ```
+
+- Save annotated frames for training (no window):
+
+  ```bash
+  python src/main.py --video_path "~/Videos/sample.mp4" --mode frames
+  ```
+
+  Frames will be written to `output/frames/frame_<index>.jpg`.
 
 ---
 
