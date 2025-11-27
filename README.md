@@ -8,11 +8,10 @@ This Proof of Concept (PoC) processes `.mp4` video files from monitoring cameras
 
 Create a Python virtual environment and install dependencies from `requirements.txt`.
 
-### **requirements.txt**
-```
-ultralytics
-opencv-python
-numpy
+The full dependency list is managed in `requirements.txt`. Install everything with:
+
+```bash
+pip install -r requirements.txt
 ```
 
 ---
@@ -48,15 +47,19 @@ pip install -r requirements.txt
 
 ---
 
-### **4. Add your video file**
-Place your `.mp4` video inside the `videos/` folder (create it if it doesn’t exist).
+### **4. Prepare your video file**
+Place your `.mp4` video anywhere on your machine. When you run the script, you will be prompted to type or paste the full path (you can use paths like `~/Downloads/video.mp4`).
 
 ---
 
 ### **5. Run the script**
+From the project root, with the virtual environment activated:
+
 ```bash
-python main.py --video_path videos/sample.mp4
+python src/main.py
 ```
+
+The script will ask for the path to the `.mp4` file you want to analyze, then open a window showing the processed video in real time. Press `q` while the window is focused to stop playback early.
 
 ---
 
@@ -64,13 +67,21 @@ python main.py --video_path videos/sample.mp4
 
 ```
 project/
-│── main.py
-│── requirements.txt
 │── README.md
-│── videos/
-│     └── sample.mp4
-│── output/
-       └── processed_<timestamp>.mp4
+│── requirements.txt
+│── venv/                  # (optional) Python virtual environment
+│── src/
+│   ├── main.py            # Entry point; asks for video path and runs analysis
+│   ├── config.py          # Basic configuration (e.g., model path, output dirs)
+│   ├── detector.py        # YOLO person detector (ultralytics YOLOv8)
+│   ├── tracker.py         # Simple ID tracker across frames
+│   ├── clothing_classifier.py  # Color-based clothing/vest classifier
+│   └── utils/
+│       ├── video_reader.py     # Frame generator for a video file
+│       └── drawing.py          # Drawing bounding boxes and labels
+│
+└── output/
+    └── frames/            # (optional) folder for saving processed frames if enabled
 ```
 
 ---
@@ -79,9 +90,10 @@ project/
 
 1. Loads YOLO via **ultralytics**  
 2. Processes the video frame-by-frame using **OpenCV**  
-3. Detects people  
-4. Draws bounding boxes and exports processed output  
-5. (Future) Add layers for:
+3. Detects people and assigns simple tracking IDs  
+4. Classifies dominant clothing color (including orange vests) and draws labeled bounding boxes  
+5. Displays the annotated video in real time (press `q` to quit)  
+6. (Future) Add layers for:
    - Movement tracking  
    - Clothing classification  
    - Pose detection  
