@@ -1,0 +1,19 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+.env/
+
+# Video files
+*.mp4
+*.avi
+*.mov
+
+# IDE settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store

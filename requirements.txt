@@ -1,0 +1,10 @@
+ultralytics==8.3.30        # YOLO models
+opencv-python==4.10.0.84   # Video processing
+numpy==1.26.4              # Number operations
+torch==2.3.1               # Required by YOLO
+torchvision==0.18.1        # Additional vision utilities
+matplotlib==3.9.0          # Optional plotting/debug
+pillow==10.4.0             # Image handling
+scikit-image==0.24.0       # Image utils (optional)
+filterpy==1.4.5            # Kalman filters (tracking)
+pandas==2.2.2              # For analytics/reporting
