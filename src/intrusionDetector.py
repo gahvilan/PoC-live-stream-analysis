@@ -59,8 +59,12 @@ class IntrusionDetector:
 
         overlay = frame.copy()
         rect = cv2.boundingRect(self.poly)
+         # Convert points to numpy array
+        pts = np.array(self.poly, dtype=np.int32)
 
-        cv2.rectangle(overlay, (rect[0], rect[1]), (rect[2], rect[3]), (100, 250, 100), 3)
+        # Draw filled polygon on overlay
+        cv2.fillPoly(overlay, [pts], color)
+        #cv2.rectangle(overlay, (rect[0], rect[1]), (rect[2], rect[3]), (100, 250, 100), -1)
 
         # Alpha blending
         return cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
