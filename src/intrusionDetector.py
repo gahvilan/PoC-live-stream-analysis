@@ -48,13 +48,14 @@ class IntrusionDetector:
      # --------------------------------------------------------
     # NEW METHOD: Draw polygon on frame (with alpha blending)
     # --------------------------------------------------------
-    def draw_polygon(self, frame, color=(0, 255, 0), thickness=2, alpha=0.4, fill=False):
+    def draw_polygon(self, frame, color=(0, 255, 0), thickness=2, alpha=0.4, fill=False, save_path=None):
         """
         Draws the polygon on the frame.
         color: BGR
         thickness: border thickness
         alpha: transparency (0–1)
         fill: if True, polygon is filled with color
+        save_path: path to save the frame (optional)
         """
 
         overlay = frame.copy()
@@ -67,7 +68,12 @@ class IntrusionDetector:
         #cv2.rectangle(overlay, (rect[0], rect[1]), (rect[2], rect[3]), (100, 250, 100), -1)
 
         # Alpha blending
-        return cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+        output = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+        
+        if save_path:
+             cv2.imwrite(save_path, output)
+             
+        return output
 
     def check_frame(self, detections, frame_id=None):
         """

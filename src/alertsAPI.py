@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
 import threading
 import time
+import json
+import os
+from config import OUTPUT_ALERTS_DIR
 
 
 class AlertService:
-    def __init__(self, port=5000 , host="0.0.0.0"):
+    def __init__(self, port=5001 , host="0.0.0.0"):
         self.alerts = []
         self.app = Flask(__name__)
         self.port = port
@@ -13,6 +16,7 @@ class AlertService:
         self.app.add_url_rule("/alerts", "get_alerts", self.get_alerts_list, methods=["GET"])
         self.app.add_url_rule("/alerts", "add_alert", self.add_alert, methods=["POST"])
         self.app.add_url_rule("/version", "version", self.get_version, methods=["GET"])
+        self.app.add_url_rule("/alerts/file", "get_alerts_file", self.get_alerts_from_file, methods=["GET"])
 
     # -----------------------------------------
     # REST API Methods
@@ -32,6 +36,17 @@ class AlertService:
 
     def get_version(self):
         return jsonify({"version": "1.0.0", "time": time.time()})
+
+    def get_alerts_from_file(self):
+        json_path = f"{OUTPUT_ALERTS_DIR}/alerts.json"
+        if not os.path.exists(json_path):
+             return jsonify({"alerts": []})
+        try:
+            with open(json_path, 'r') as f:
+                data = json.load(f)
+            return jsonify({"alerts": data})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 
     # -----------------------------------------
     # Run Flask in a background thread

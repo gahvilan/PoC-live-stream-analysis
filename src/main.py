@@ -1,5 +1,7 @@
 import os
+import time
 import argparse
+import json
 import cv2
 from detector import PersonDetector
 from tracker import SimpleTracker
@@ -8,7 +10,7 @@ from alertsAPI import AlertService
 from intrusionDetector import IntrusionDetector
 from utils.video_reader import read_video , jump_frames , get_actual_frame , get_frame_count,frame_to_seconds
 from utils.drawing import draw_box
-from config import OUTPUT_DIR, MODEL_PATH
+from config import OUTPUT_DIR, MODEL_PATH, OUTPUT_ALERTS_DIR
 
 def ensure_dir(path):
     os.makedirs(path, exist_ok=True)
@@ -58,17 +60,30 @@ def main_loop(video_path, service, mode):
 
   
     activation =0
-
+    old_timestamp = 0
+    all_alerts = []
+    
     for frame in read_video(video_path, 35000):
         frame = cv2.resize(frame, (1280, 720) )
         persons = detector.detect(frame)
         tracked = tracker.update(persons)
 
+        timestamp = int(time.time())
+
         alerts = intrusion.check_frame(persons)
         #### report active alerts until new are obtained
-        if len(alerts) > 0:
+        if len(alerts) > 0 and timestamp != old_timestamp: ### save the alert only if it is a new one
+            
+            for alert in alerts:
+                alert['timestamp'] = timestamp
+                all_alerts.append(alert)
+                
             service.set_alerts(alerts)
             activation = 50
+            old_timestamp = timestamp            
+            # Save to JSON
+            with open(f"{OUTPUT_ALERTS_DIR}/alerts.json", "w") as f:
+                json.dump(all_alerts, f, indent=4)
 
         render_frame = intrusion.draw_polygon(frame)
             
@@ -109,6 +124,7 @@ def main_loop(video_path, service, mode):
 ################################################################################
 def main(video_path: str | None = None, mode: str = "realtime"):
     ensure_dir(OUTPUT_DIR)
+    ensure_dir(OUTPUT_ALERTS_DIR)
 
    
     # 🔥 Ask user for input
@@ -119,7 +135,11 @@ def main(video_path: str | None = None, mode: str = "realtime"):
 
     print(f"\n📹 Processing video: {video_path} (mode={mode})")
 #############################
-    
+    # Clean up old alerts
+    json_path = f"{OUTPUT_ALERTS_DIR}/alerts.json"
+    if os.path.exists(json_path):
+        os.remove(json_path)
+
     service = AlertService()
     service.run()
 
@@ -129,7 +149,7 @@ def main(video_path: str | None = None, mode: str = "realtime"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--video_path", type=str, default="E:/Resources/Ocasa/2410133_C08_M77R2_2_20251104_095113.mp4")
+    parser.add_argument("--video_path", type=str, default="2410133_C07_M77R2_3_20251103_110000.mp4")
     parser.add_argument("--mode", type=str, choices=["realtime", "frames"], default="realtime")
     args = parser.parse_args()
 

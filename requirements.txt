@@ -8,3 +8,4 @@ pillow==10.4.0             # Image handling
 scikit-image==0.24.0       # Image utils (optional)
 filterpy==1.4.5            # Kalman filters (tracking)
 pandas==2.2.2              # For analytics/reporting
+flask==3.0.0               # API server
